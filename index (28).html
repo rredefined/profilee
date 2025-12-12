@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MCHAVEN — Server Status</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1a2b;
+      --muted:#99a0b6;
+      --accent:#3aa0ff;
+      --success:#39d353;
+      --danger:#ff6b6b;
+      --glass: rgba(255,255,255,0.03);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+      background: linear-gradient(180deg,var(--bg) 0%, #021026 100%);
+      color:#e6eef8;
+      padding:20px;
+    }
+
+    .wrap{ width:100%; max-width:960px; margin:auto; }
+
+    nav{
+      display:flex; justify-content:flex-end; gap:10px; margin-bottom:20px;
+    }
+    nav a{
+      padding:8px 12px;
+      background:#122543;
+      border-radius:8px;
+      color:white;
+      text-decoration:none;
+      font-size:13px;
+      transition:0.2s;
+    }
+    nav a:hover{
+      background:#1e3b6b;
+    }
+
+    header{
+      display:flex; align-items:center; gap:16px; margin-bottom:18px;
+    }
+
+    .logo {
+      width:64px; height:64px; border-radius:12px;
+      background:var(--glass);
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+      box-shadow:0 6px 18px rgba(0,0,0,0.5);
+    }
+
+    .title { font-size:22px; line-height:1; font-weight:700; }
+    .subtitle { color:var(--muted); font-size:14px; margin-top:6px; }
+
+    .connection-info {
+      margin-top:8px;
+      font-size:14px;
+      color:#9ab6ff;
+      line-height:1.5;
+    }
+    .connection-info b { color:#cdd9ff; }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;
+      padding:18px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .status-row{ display:flex; gap:18px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .server-info { display:flex; gap:14px; align-items:center; }
+
+    .icon {
+      width:92px;height:92px;border-radius:12px;
+      background:linear-gradient(180deg,#071022,#0b1a2b);
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(255,255,255,0.03);
+      overflow:hidden;
+    }
+    .icon img { width:100%; height:100%; object-fit:cover; }
+
+    .meta h2 { margin:0; font-size:18px; }
+    .meta p { margin:6px 0 0; color:var(--muted); font-size:13px; }
+
+    .badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .badge {
+      padding:6px 10px;border-radius:10px;font-size:13px;background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .online { color:var(--success); font-weight:600; }
+    .offline { color:var(--danger); font-weight:600; }
+
+    .big {
+      min-width:180px; text-align:center;
+      background: rgba(255,255,255,0.01);
+      padding:10px 12px;border-radius:10px;
+    }
+    .big .num { font-weight:700; font-size:24px; display:block; }
+
+    .controls { display:flex; gap:10px; }
+    .btn {
+      padding:8px 12px;border-radius:10px;border:0;background:var(--accent);color:#021026;font-weight:700;
+      cursor:pointer; box-shadow: 0 6px 18px rgba(58,160,255,0.12);
+    }
+    .btn.secondary { background:transparent;border:1px solid rgba(255,255,255,0.06); color:var(--muted); }
+
+    hr { border:0; height:1px; background:linear-gradient(90deg,transparent,#ffffff14,transparent); margin:14px 0; }
+
+    footer { text-align:center; color:var(--muted); font-size:12px; margin-top:12px; }
+
+    @media (max-width:720px){
+      .status-row{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Right Buttons -->
+  <nav>
+    <a href="https://www.youtube.com/@mchaven08" target="_blank">YouTube</a>
+    <a href="https://discord.mchaven.fun/" target="_blank">Discord</a>
+    <a href="https://www.instagram.com/mchaven08" target="_blank">Instagram</a>
+  </nav>
+
+  <div class="wrap">
+    <header>
+      <div class="logo" id="serverIconPlaceholder">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+          <rect x="1" y="3" width="22" height="18" rx="3" fill="#021026" stroke="#ffffff12"/>
+          <path d="M4 8h16" stroke="#ffffff20" stroke-width="0.8"/>
+        </svg>
+      </div>
+      <div>
+        <div class="title">MCHAVEN</div>
+        <div class="subtitle">Minecraft Server Status — Auto update every 15s</div>
+
+        <div class="connection-info">
+          <b>Java Edition:</b> play.mchaven.fun — <b>25565</b><br>
+          <b>Bedrock / PE:</b> play.mchaven.fun — <b>25565</b>
+        </div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="status-row">
+        <div class="server-info">
+          <div class="icon" id="serverIcon"></div>
+
+          <div class="meta">
+            <h2 id="statusTitle">Checking server…</h2>
+            <p>play.mchaven.fun:25565</p>
+
+            <div class="badges">
+              <span class="badge">Status: <span id="onlineText">—</span></span>
+              <span class="badge">Version: <strong id="version">—</strong></span>
+              <span class="badge">Players: <strong id="playersCount">—</strong></span>
+              <span class="badge">Ping: <strong id="ping">—</strong>ms</span>
+            </div>
+
+            <div class="motd" id="motd">Waiting for server data…</div>
+          </div>
+        </div>
+
+        <div class="right-panel">
+          <div class="big">
+            <span class="num" id="onlineNum">—</span>
+            <span style="font-size:12px;color:var(--muted)">online players</span>
+          </div>
+
+          <div class="controls">
+            <button class="btn small" id="joinBtn">Copy Address</button>
+            <button class="btn secondary small" id="refreshBtn">Refresh</button>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div id="lastUpdated">Last checked: —</div>
+        <div class="note">Developed by Notskyblueee</div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const SERVER_REAL = "r9-in1.strengthcloud.xyz:25565";
+    const DISPLAY_ADDRESS = "play.mchaven.fun:25565";
+    const API = "https://api.mcsrvstat.us/2/" + SERVER_REAL;
+    const INTERVAL = 15000;
+    const el = id => document.getElementById(id);
+
+    async function fetchStatus() {
+      const t0 = performance.now();
+      try {
+        const res = await fetch(API, { cache: "no-store" });
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+        const ping = Math.round(performance.now() - t0);
+        render(data, ping);
+      } catch (e) {
+        offline();
+      }
+    }
+
+    function render(data, ping) {
+      const online = data.online;
+      const players = data.players || {};
+
+      el("onlineText").textContent = online ? "Online" : "Offline";
+      el("onlineText").className = online ? "online" : "offline";
+      el("version").textContent = data.version || "—";
+      el("playersCount").textContent = `${players.online || 0} / ${players.max || "—"}`;
+      el("ping").textContent = ping;
+      el("statusTitle").textContent = online ? "Server is online" : "Server is offline";
+      el("motd").textContent = data.motd?.clean?.join("\n") || "—";
+      el("onlineNum").textContent = players.online || 0;
+      el("lastUpdated").textContent = "Last checked: " + new Date().toLocaleString();
+
+      if (data.icon) {
+        let src = data.icon.startsWith("data:") ? data.icon : "data:image/png;base64," + data.icon;
+        el("serverIcon").innerHTML = `<img src="${src}">`;
+        el("serverIconPlaceholder").innerHTML = `<img src="${src}">`;
+      }
+    }
+
+    function offline() {
+      el("onlineText").textContent = "Offline";
+      el("onlineText").className = "offline";
+      el("version").textContent = "—";
+      el("playersCount").textContent = "—";
+      el("ping").textContent = "—";
+      el("statusTitle").textContent = "Server is offline or unreachable";
+      el("motd").textContent = "Could not reach server";
+      el("onlineNum").textContent = "0";
+      el("lastUpdated").textContent = "Last checked: " + new Date().toLocaleString();
+    }
+
+    document.getElementById("refreshBtn").onclick = fetchStatus;
+    document.getElementById("joinBtn").onclick = () => {
+      navigator.clipboard.writeText(DISPLAY_ADDRESS);
+      el("joinBtn").textContent = "Copied!";
+      setTimeout(() => el("joinBtn").textContent = "Copy Address", 1500);
+    };
+
+    fetchStatus();
+    setInterval(fetchStatus, INTERVAL);
+  </script>
+
+</body>
+</html>
